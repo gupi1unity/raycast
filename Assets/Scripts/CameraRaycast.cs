@@ -5,6 +5,12 @@ using UnityEngine;
 public class CameraRaycast : MonoBehaviour
 {
     private Camera _camera;
+
+    [SerializeField] private LayerMask _ground;
+
+    private Vector3 _groundPoint;
+
+    private Transform _currentObject;
     
 
     private void Awake()
@@ -18,18 +24,31 @@ public class CameraRaycast : MonoBehaviour
 
         Debug.DrawRay(_camera.ScreenToWorldPoint(Input.mousePosition), _camera.transform.forward * 100f, Color.green);
 
-        if (Physics.Raycast(ray, out RaycastHit hitInfo, 100f))
+        if (Physics.Raycast(ray, out RaycastHit groundHitInfo, 100f, _ground.value))
         {
-            if (hitInfo.collider.gameObject.TryGetComponent<IMovable>(out IMovable gameObject))
+            _groundPoint = groundHitInfo.point;
+        }
+
+        if (Physics.Raycast(ray, out RaycastHit colliderHitInfo, 100f))
+        {
+            if (colliderHitInfo.collider.gameObject.TryGetComponent<Box>(out Box box))
             {
                 Debug.DrawRay(_camera.ScreenToWorldPoint(Input.mousePosition), _camera.transform.forward * 100f, Color.red);
 
                 if (Input.GetMouseButton(0))
                 {
-                    Vector3 moveDirection = _camera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, 5f));
-                    gameObject.Move(moveDirection);
+                    _currentObject = box.transform;
+                }
+                else
+                {
+                    _currentObject = null;
                 }
             }
+        }
+
+        if (_currentObject != null)
+        {
+            _currentObject.position = new Vector3(_groundPoint.x, 2f, _groundPoint.z);
         }
     }
 }
