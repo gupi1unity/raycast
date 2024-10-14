@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CameraTaker : MonoBehaviour
+public class Grabber : MonoBehaviour
 {
     private const float RayDistance = 100f;
 
@@ -21,26 +21,24 @@ public class CameraTaker : MonoBehaviour
 
     private void Update()
     {
-        Ray ray = _camera.ScreenPointToRay(Input.mousePosition);
+        if (Input.GetKey(_takeKey))
+        {
+            Ray ray = _camera.ScreenPointToRay(Input.mousePosition);
 
-        CheckButtonUp();
+            FindGround(ray);
 
-        Debug.DrawRay(_camera.ScreenToWorldPoint(Input.mousePosition), _camera.transform.forward * RayDistance, Color.green);
+            FindDraggableObject(ray);
 
-        CreateRayToGround(ray);
-
-        CreateRayToObject(ray);
-
-        CheckObjectNull();
-    }
-
-    private void CheckButtonUp()
-    {
-        if (!Input.GetKey(_takeKey))
+            DragObjectToPosition();
+        }
+        else
+        {
             _currentObject = null;
+        }
+
     }
 
-    private void CreateRayToGround(Ray ray)
+    private void FindGround(Ray ray)
     {
         if (Physics.Raycast(ray, out RaycastHit groundHitInfo, RayDistance, _ground.value))
         {
@@ -48,23 +46,18 @@ public class CameraTaker : MonoBehaviour
         }
     }
 
-    private void CreateRayToObject(Ray ray)
+    private void FindDraggableObject(Ray ray)
     {
         if (Physics.Raycast(ray, out RaycastHit colliderHitInfo, RayDistance))
         {
-            if (colliderHitInfo.collider.gameObject.TryGetComponent<Obstacle>(out Obstacle box) && colliderHitInfo.collider.gameObject.TryGetComponent<IInteractable>(out IInteractable interactable))
+            if (colliderHitInfo.collider.gameObject.TryGetComponent<IDraggable>(out IDraggable draggable))
             {
-                Debug.DrawRay(_camera.ScreenToWorldPoint(Input.mousePosition), _camera.transform.forward * RayDistance, Color.red);
-
-                if (Input.GetKey(_takeKey))
-                {
-                    _currentObject = box.transform;
-                }
+                _currentObject = draggable.ObjectTransform;
             }
         }
     }
 
-    private void CheckObjectNull()
+    private void DragObjectToPosition()
     {
         if (_currentObject != null)
         {

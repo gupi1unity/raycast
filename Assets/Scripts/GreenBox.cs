@@ -2,10 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GreenBox : Obstacle, IInteractable, IExplosion
+public class GreenBox : MonoBehaviour, IDraggable
 {
-    public void Interact(Vector3 moveDirection)
-    {
-        transform.position = moveDirection;
-    }
+    public Transform ObjectTransform => transform;
 }

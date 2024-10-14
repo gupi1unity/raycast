@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Explosion : MonoBehaviour
+public class ExplosionShooter : MonoBehaviour
 {
     private const float RayDistance = 100f;
 
@@ -33,9 +33,8 @@ public class Explosion : MonoBehaviour
 
                 foreach (Collider collider in colliders)
                 {
-                    if (collider.TryGetComponent<IExplosion>(out IExplosion explosion))
+                    if (collider.TryGetComponent<Rigidbody>(out Rigidbody rigidbody))
                     {
-                        Rigidbody rigidbody = collider.gameObject.GetComponent<Rigidbody>();
                         rigidbody.AddExplosionForce(_explosionForce, hitInfo.point, _explosionRadius);
                     }
                 }
