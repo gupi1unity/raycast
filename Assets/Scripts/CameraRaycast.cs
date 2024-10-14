@@ -4,12 +4,14 @@ using UnityEngine;
 
 public class CameraRaycast : MonoBehaviour
 {
+    private const float RayDistance = 100f;
+
     private Camera _camera;
 
+    [SerializeField] private KeyCode _takeKey = KeyCode.Mouse0;
     [SerializeField] private LayerMask _ground;
-
+    [SerializeField] private float _yUpPosition = 2f;
     private Vector3 _groundPoint;
-
     private Transform _currentObject;
     
 
@@ -22,33 +24,52 @@ public class CameraRaycast : MonoBehaviour
     {
         Ray ray = _camera.ScreenPointToRay(Input.mousePosition);
 
-        Debug.DrawRay(_camera.ScreenToWorldPoint(Input.mousePosition), _camera.transform.forward * 100f, Color.green);
+        CheckButtonUp();
 
-        if (Physics.Raycast(ray, out RaycastHit groundHitInfo, 100f, _ground.value))
+        Debug.DrawRay(_camera.ScreenToWorldPoint(Input.mousePosition), _camera.transform.forward * RayDistance, Color.green);
+
+        CreateRayToGround(ray);
+
+        CreateRayToObject(ray);
+
+        CheckObjectNull();
+    }
+
+    private void CheckButtonUp()
+    {
+        if (!Input.GetKey(_takeKey))
+            _currentObject = null;
+    }
+
+    private void CreateRayToGround(Ray ray)
+    {
+        if (Physics.Raycast(ray, out RaycastHit groundHitInfo, RayDistance, _ground.value))
         {
             _groundPoint = groundHitInfo.point;
         }
+    }
 
-        if (Physics.Raycast(ray, out RaycastHit colliderHitInfo, 100f))
+    private void CreateRayToObject(Ray ray)
+    {
+        if (Physics.Raycast(ray, out RaycastHit colliderHitInfo, RayDistance))
         {
-            if (colliderHitInfo.collider.gameObject.TryGetComponent<Box>(out Box box))
+            if (colliderHitInfo.collider.gameObject.TryGetComponent<Obstacle>(out Obstacle box))
             {
-                Debug.DrawRay(_camera.ScreenToWorldPoint(Input.mousePosition), _camera.transform.forward * 100f, Color.red);
+                Debug.DrawRay(_camera.ScreenToWorldPoint(Input.mousePosition), _camera.transform.forward * RayDistance, Color.red);
 
-                if (Input.GetMouseButton(0))
+                if (Input.GetKey(_takeKey))
                 {
                     _currentObject = box.transform;
                 }
-                else
-                {
-                    _currentObject = null;
-                }
             }
         }
+    }
 
+    private void CheckObjectNull()
+    {
         if (_currentObject != null)
         {
-            _currentObject.position = new Vector3(_groundPoint.x, 2f, _groundPoint.z);
+            _currentObject.position = new Vector3(_groundPoint.x, _yUpPosition, _groundPoint.z);
         }
     }
 }
