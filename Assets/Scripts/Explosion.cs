@@ -9,7 +9,10 @@ public class Explosion : MonoBehaviour
     private Camera _camera;
 
     [SerializeField] private KeyCode _explosionKey = KeyCode.Mouse1;
-    [SerializeField] private int _damage = 10;
+    [SerializeField] private ParticleSystem _particleSystem;
+
+    [SerializeField] private float _explosionForce = 10f;
+    [SerializeField] private float _explosionRadius = 5f;
 
     private void Awake()
     {
@@ -22,15 +25,18 @@ public class Explosion : MonoBehaviour
 
         if (Physics.Raycast(ray, out RaycastHit hitInfo, RayDistance))
         {
-            Collider[] colliders = Physics.OverlapSphere(hitInfo.point, 5f);
-
             if (Input.GetKeyDown(_explosionKey))
             {
+                Instantiate(_particleSystem, hitInfo.point, Quaternion.identity);
+
+                Collider[] colliders = Physics.OverlapSphere(hitInfo.point, _explosionRadius);
+
                 foreach (Collider collider in colliders)
                 {
-                    if (collider.gameObject.TryGetComponent<IDamagable>(out IDamagable gameObject))
+                    if (collider.TryGetComponent<IExplosion>(out IExplosion explosion))
                     {
-                        gameObject.TakeDamage(_damage);
+                        Rigidbody rigidbody = collider.gameObject.GetComponent<Rigidbody>();
+                        rigidbody.AddExplosionForce(_explosionForce, hitInfo.point, _explosionRadius);
                     }
                 }
             }

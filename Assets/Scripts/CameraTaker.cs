@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CameraRaycast : MonoBehaviour
+public class CameraTaker : MonoBehaviour
 {
     private const float RayDistance = 100f;
 
@@ -13,7 +13,6 @@ public class CameraRaycast : MonoBehaviour
     [SerializeField] private float _yUpPosition = 2f;
     private Vector3 _groundPoint;
     private Transform _currentObject;
-    
 
     private void Awake()
     {
@@ -53,7 +52,7 @@ public class CameraRaycast : MonoBehaviour
     {
         if (Physics.Raycast(ray, out RaycastHit colliderHitInfo, RayDistance))
         {
-            if (colliderHitInfo.collider.gameObject.TryGetComponent<Obstacle>(out Obstacle box))
+            if (colliderHitInfo.collider.gameObject.TryGetComponent<Obstacle>(out Obstacle box) && colliderHitInfo.collider.gameObject.TryGetComponent<IInteractable>(out IInteractable interactable))
             {
                 Debug.DrawRay(_camera.ScreenToWorldPoint(Input.mousePosition), _camera.transform.forward * RayDistance, Color.red);
 

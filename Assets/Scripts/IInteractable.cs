@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public interface IMovable
+public interface IInteractable
 {
-    public void Move(Vector3 moveDirection);
+    public void Interact(Vector3 moveDirection);
 }
