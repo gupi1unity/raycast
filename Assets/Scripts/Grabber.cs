@@ -2,26 +2,29 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Grabber : MonoBehaviour
+public class Grabber
 {
     private const float RayDistance = 100f;
 
     private Camera _camera;
 
-    [SerializeField] private KeyCode _takeKey = KeyCode.Mouse0;
-    [SerializeField] private LayerMask _ground;
-    [SerializeField] private float _yUpPosition = 2f;
+    private KeyCode _grabKey;
+    private LayerMask _ground;
+    private float _yUpPosition;
     private Vector3 _groundPoint;
     private Transform _currentObject;
 
-    private void Awake()
+    public Grabber(Camera camera, KeyCode grabKey, LayerMask ground, float yUpPosition)
     {
-        _camera = Camera.main;
+        _camera = camera;
+        _grabKey = grabKey;
+        _ground = ground;
+        _yUpPosition = yUpPosition;
     }
 
-    private void Update()
+    public void Grab()
     {
-        if (Input.GetKey(_takeKey))
+        if (Input.GetKey(_grabKey))
         {
             Ray ray = _camera.ScreenPointToRay(Input.mousePosition);
 

@@ -2,32 +2,37 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ExplosionShooter : MonoBehaviour
+public class ExplosionShooter
 {
     private const float RayDistance = 100f;
 
     private Camera _camera;
 
-    [SerializeField] private KeyCode _explosionKey = KeyCode.Mouse1;
-    [SerializeField] private ParticleSystem _particleSystem;
+    private KeyCode _explosionKey;
+    private ParticleSystem _particleSystem;
 
-    [SerializeField] private float _explosionForce = 10f;
-    [SerializeField] private float _explosionRadius = 5f;
+    private float _explosionForce = 10f;
+    private float _explosionRadius = 5f;
 
-    private void Awake()
+    public ExplosionShooter(Camera camera, KeyCode explosionKey, ParticleSystem particleSystem, float explosionForce, float explosionRadius)
     {
-        _camera = Camera.main;
+        _camera = camera;
+        _explosionKey = explosionKey;
+        _particleSystem = particleSystem;
+        _explosionForce = explosionForce;
+        _explosionRadius = explosionRadius;
     }
 
-    private void Update()
+    public void Explode()
     {
         Ray ray = _camera.ScreenPointToRay(Input.mousePosition);
 
-        if (Physics.Raycast(ray, out RaycastHit hitInfo, RayDistance))
+        if (Input.GetKeyDown(_explosionKey))
         {
-            if (Input.GetKeyDown(_explosionKey))
+            if (Physics.Raycast(ray, out RaycastHit hitInfo, RayDistance))
             {
-                Instantiate(_particleSystem, hitInfo.point, Quaternion.identity);
+                _particleSystem.transform.position = hitInfo.point;
+                _particleSystem.Play();
 
                 Collider[] colliders = Physics.OverlapSphere(hitInfo.point, _explosionRadius);
 
@@ -40,5 +45,6 @@ public class ExplosionShooter : MonoBehaviour
                 }
             }
         }
+
     }
 }

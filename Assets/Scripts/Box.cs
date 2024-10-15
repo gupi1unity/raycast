@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GreenBox : MonoBehaviour, IDraggable
+public class Box : MonoBehaviour, IDraggable
 {
     public Transform ObjectTransform => transform;
 }
